@@ -12,6 +12,6 @@ urlpatterns = [
     path('', views.index, name='home'),
     path('add_hil', views.HilManager.as_view(), name='add_hil'),
     # Matches any html file
-    # re_path(r'^(?!hils\/$).*\.*', views.pages, name='pages'),
+    re_path(r'^(?!hils\/$).*\.*', views.pages, name='pages'),
 
 ]

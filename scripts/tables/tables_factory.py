@@ -1,6 +1,10 @@
 from django_tables2.tables import Table
 
 
+def get_model_fields(model):
+    return [field.name for field in model._meta.fields if field.auto_created is False]
+
+
 def table_factory(model, table=Table, fields=None, exclude=None, localize=None, parent_meta=None, extra_columns=None):
     """
     Return Table class for given `model`, equivalent to defining a custom table class::
@@ -30,10 +34,13 @@ def table_factory(model, table=Table, fields=None, exclude=None, localize=None, 
     if not parent_meta:
         parent = (table.Meta, object) if hasattr(table, "Meta") else (object,)
     else:
-        setattr(parent_meta, 'fields', ['name', 'responsible', 'Delete', 'Add', 'station'])
+        default_fields = get_model_fields(model)
+        default_fields.extend([str(cls()).capitalize() for cls in extra_columns])
+        setattr(parent_meta, 'fields', default_fields)
         parent = (parent_meta, )
 
     meta = type("Meta", parent, attrs)
+
     # define extra columns class which
     if extra_columns:
         extra_col_class = type('buttons', (Table, ), {str(cls()): cls.accessor for cls in extra_columns})

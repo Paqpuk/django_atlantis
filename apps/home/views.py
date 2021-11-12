@@ -62,7 +62,7 @@ class HilManager(View):
         note = str()
         if form.is_valid():
             form.save()
-            note = 'Form is not valid; you are too good'
+            note = 'success'
         else:
             note = 'Form is not valid'
         return render(request, 'home/p_forms.html', {
