@@ -1,21 +1,7 @@
-import django_tables2 as tables
-from django.utils.html import format_html
 from .models import HILs
-from django.urls import reverse
-from django_tables2.utils import A
+from scripts.tables.tables_factory import table_factory
+from scripts.tables.extra_columns import Delete, Add
+from scripts.tables.themes import Atlantis
 
 
-class HILsTable(tables.Table):
-    delete = tables.Column(accessor=A('pk'), verbose_name='Delete')
-
-    class Meta:
-
-        attrs = {"class": "display table table-bordered table-head-bg-info table-bordered-bd-info mt-4",
-                 "id": "basic-datatables"}
-        model = HILs
-        fields = ("name", "station", "responsible", "delete")
-        orderable = False
-        show_footer = False
-
-    def render_delete(self, record):
-        return format_html('<a href="delete/{id}/">{id}</a>', id=record.id)
+HILsTable = table_factory(HILs, parent_meta=Atlantis, extra_columns=[Delete, Add])

@@ -2,12 +2,14 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
-
+from django.shortcuts import render
+from django.views import View
 from django import template
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
+from apps.table_view.forms import HILsForm
 
 
 @login_required(login_url="/login/")
@@ -44,3 +46,27 @@ def pages(request):
         return HttpResponse(html_template.render(context, request))
 
 
+class HilManager(View):
+
+    @staticmethod
+    def get(request):
+        form = HILsForm()
+        return render(request, 'home/p_forms.html', {
+            'form': form,
+            'form_title': str(HILsForm())
+        })
+
+    @staticmethod
+    def post(request):
+        form = HILsForm(request.POST)
+        note = str()
+        if form.is_valid():
+            form.save()
+            note = 'Form is not valid; you are too good'
+        else:
+            note = 'Form is not valid'
+        return render(request, 'home/p_forms.html', {
+            'form': form,
+            'form_title': str(HILsForm()),
+            'note': note
+        })

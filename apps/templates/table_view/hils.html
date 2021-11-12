@@ -12,18 +12,22 @@
 {% block content %}
 
 	<!-- Modal-->
+	{% if formurl %}
 	<div class="modal fade" tabindex="-1" role="dialog" id="modal">
 	  <div class="modal-dialog" role="document">
 		<div class="modal-content"></div>
 	  </div>
 	</div>
-
+	{% endif %}
 	<div class="card">
 		<div class="card-header">
 			<h4 class="card-title">
 				HIL configuration
 				<!-- Create book button -->
-				<button id="add-new-hils" class="btn btn-primary" style="float: right;" ttype="button" name="button">Add new</button>
+				{% if formurl %}
+					<button id="add-new-hils" class="btn btn-primary" style="float: right;" type="button" name="button">Add new</button>
+				{% endif %}
+
 			</h4>
 
 		</div>

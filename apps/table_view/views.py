@@ -1,4 +1,6 @@
 from django_tables2 import SingleTableView
+from pip._internal import req
+
 from .models import HILs
 from .tables import HILsTable
 from .forms import HILsModalForm
@@ -19,6 +21,10 @@ class BookCreateView(BSModalCreateView):
     form_class = HILsModalForm
     success_message = 'Success: Book was created.'
     success_url = reverse_lazy('hils')
+
+    # @staticmethod
+    # def post(request):
+    #     print(request)
 
 
 def delete(request, hil_id):
