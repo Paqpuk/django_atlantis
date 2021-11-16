@@ -1,11 +1,14 @@
 from django_tables2.tables import Table
+from ..themes import themes
 
 
 def get_model_fields(model):
     return [field.name for field in model._meta.fields if field.auto_created is False]
 
 
-def table_factory(model, table=Table, fields=None, exclude=None, localize=None, parent_meta=None, extra_columns=None):
+def table_factory(model, table=Table, fields=None, exclude=None,
+                  localize=None, theme: type = themes.Atlantis,
+                  extra_columns: list = None):
     """
     Return Table class for given `model`, equivalent to defining a custom table class::
 
@@ -19,27 +22,25 @@ def table_factory(model, table=Table, fields=None, exclude=None, localize=None, 
         :param fields: (list of str): Fields displayed in tables
         :param exclude: (list of str): Fields exclude in tables
         :param localize: (list of str): Fields to localize
-        :param parent_meta:
-        :param extra_columns: extra column class from extra_column.py
+        :param theme: ('scripts.themes.AbstractTheme'): class with Meta attrs
+        :param extra_columns: (list of AbstractExtraColumn) extra column classes from extra_column.py
     """
     attrs = {"model": model}
     if fields is not None:
         attrs["fields"] = fields
+    else:
+        default_fields = get_model_fields(model)
+        default_fields.extend([str(cls()).capitalize() for cls in extra_columns])
+        attrs["fields"] = default_fields
     if exclude is not None:
         attrs["exclude"] = exclude
     if localize is not None:
         attrs["localize"] = localize
-    # If parent form class already has an inner Meta, the Meta we're
-    # creating needs to inherit from the parent's inner meta.
-    if not parent_meta:
-        parent = (table.Meta, object) if hasattr(table, "Meta") else (object,)
-    else:
-        default_fields = get_model_fields(model)
-        default_fields.extend([str(cls()).capitalize() for cls in extra_columns])
-        setattr(parent_meta, 'fields', default_fields)
-        parent = (parent_meta, )
-
-    meta = type("Meta", parent, attrs)
+    # Check if user implemented abstracted properties
+    _ = theme()  # will raise TypeError if 'table_meta_attrs' is missing
+    attrs.update(theme.table_meta_attrs)
+    # Create 'Meta'
+    meta = type("Meta", (object,), attrs)
 
     # define extra columns class which
     if extra_columns:

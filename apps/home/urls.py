@@ -10,8 +10,8 @@ urlpatterns = [
 
     # The home page
     path('', views.index, name='home'),
-    path('add_hil', views.HilManager.as_view(), name='add_hil'),
+    # path('add_hil', views.HilManager.as_view(), name='add_hil'),
     # Matches any html file
-    re_path(r'^(?!hils\/$).*\.*', views.pages, name='pages'),
+    # re_path(r'^(?!hils\/$).*\.*', views.pages, name='pages'),
 
 ]

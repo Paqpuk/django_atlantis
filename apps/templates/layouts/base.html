@@ -72,7 +72,7 @@
 
 
 					{% block content %}{% endblock content %}
-
+<!--TO DO: define our own footer-->
 <!--			{% include 'includes/footer.html' %}-->
 
 				</div>
@@ -92,7 +92,42 @@
 
     <!-- Specific Page JS goes HERE  -->
     {% block javascripts %}{% endblock javascripts %}
+	<script>
+	{% if messages %}
+		{% for message in messages %}
+			var note = "{{ message }}";
+			{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+				swal(note, {
+								icon : "error",
+								buttons: {
+									confirm: {
+										className : 'btn btn-danger'
+									}
+								},
+							});
+			{% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+				swal(note, {
+								icon : "success",
+								background : 'blue',
+								buttons: {
+									confirm: {
+										className : 'btn btn-success'
+									}
+								},
+							});
+			{% else %}
+				swal(note, {
+						buttons: {
+							confirm: {
+								className : 'btn btn-success'
+							}
+						},
+					});
+			{% endif %}
 
+		{% endfor %}
+	{% endif %}
+	</script>
 
 </body>
 </html>

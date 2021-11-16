@@ -1,7 +1,7 @@
-from .models import HILs
-from scripts.tables.tables_factory import table_factory
-from scripts.tables.extra_columns import Delete, Add
-from scripts.tables.themes import Atlantis
-
-
-HILsTable = table_factory(HILs, parent_meta=Atlantis, extra_columns=[Delete, Add])
+# from .models import HILs
+# from scripts.factrories.tables_factory import table_factory
+# from scripts.themes.extra_columns import Delete, Add
+# from scripts.themes.themes import Atlantis
+#
+#
+# HILsTable = table_factory(HILs, theme=Atlantis, extra_columns=[Delete, Add])

@@ -1,0 +1,32 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Form template {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+
+
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <h4 class="card-title">
+            {{ form_title }}
+            <form action="{{ formurl }}" method="post">
+                {% csrf_token %}
+                {{ form }}
+                <input id="form-submit" type="submit" value="Submit" class="btn btn-primary">
+            </form>
+        </h4>
+    </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+{% endblock javascripts %}
