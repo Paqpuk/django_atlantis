@@ -1,42 +1,48 @@
 import abc
+from django import forms
 
 
-class AbstractTheme(abc.ABC, metaclass=abc.ABCMeta):
-    @property
+class AbstractTheme(abc.ABC):
+    """
+    A template for a theme
+    """
+    @classmethod
     @abc.abstractmethod
-    def table_meta_attrs(self):
+    class TableMeta:
         """
-        Dict with attributes for the django_tables2.tables.Table Meta
-        Example:
-        table_meta_attrs = {
-        "attrs": {
+        The 'Meta' class that is normally used by the django_tables2.tables.Table class
+        """
+        attrs = {
             "class": "display table table-bordered table-head-bg-info table-bordered-bd-info mt-4",
             "id": "basic-datatables"
-            },
-        "orderable": False
         }
-        """
-        pass
+        orderable = False
 
     @property
     @abc.abstractmethod
-    def forms_widget_attrs(self):
+    class FormClass(forms.ModelForm):
         """
-        Dict with widget attributes to be added all widgets in form
-        Example:
-        forms_widget_attrs = {"class": "form-control"}
+        A custom class with super().init() to overwrite desired
+        ModelForm attributes in accordance to the theme
         """
-        pass
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            for visible in self.visible_fields():
+                visible.field.widget.attrs['class'] = 'form-control'
 
 
 class Atlantis(AbstractTheme):
-    table_meta_attrs = {
-        "attrs": {
+    class TableMeta:
+        attrs = {
             "class": "display table table-bordered table-head-bg-info table-bordered-bd-info mt-4",
             "id": "basic-datatables"
-        },
-        "orderable": False
-    }
-    forms_widget_attrs = {"class": "form-control"}
+        }
+        orderable = False
+
+    class FormClass(forms.ModelForm):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            for visible in self.visible_fields():
+                visible.field.widget.attrs['class'] = 'form-control'
 
 

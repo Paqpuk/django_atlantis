@@ -7,7 +7,7 @@ def get_model_fields(model):
 
 
 def table_factory(model, table=Table, fields=None, exclude=None,
-                  localize=None, theme: type = themes.Atlantis,
+                  localize=None, theme: type[themes.AbstractTheme] = themes.Atlantis,
                   extra_columns: list = None):
     """
     Return Table class for given `model`, equivalent to defining a custom table class::
@@ -36,11 +36,9 @@ def table_factory(model, table=Table, fields=None, exclude=None,
         attrs["exclude"] = exclude
     if localize is not None:
         attrs["localize"] = localize
-    # Check if user implemented abstracted properties
-    _ = theme()  # will raise TypeError if 'table_meta_attrs' is missing
-    attrs.update(theme.table_meta_attrs)
-    # Create 'Meta'
-    meta = type("Meta", (object,), attrs)
+
+    # Create Meta
+    meta = type('', (theme.TableMeta, ), attrs)
 
     # define extra columns class which
     if extra_columns:

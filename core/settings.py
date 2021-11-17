@@ -33,7 +33,8 @@ INSTALLED_APPS = [
     'apps.table_view',
     'django_tables2',
     'bootstrap_modal_forms',
-    'widget_tweaks'
+    'widget_tweaks',
+    'chartjs'
 ]
 
 MIDDLEWARE = [

@@ -1,41 +1,62 @@
-import django_tables2 as tables
+# builtins
 import random
-from django_tables2.utils import A
-from django.utils.html import format_html
-from django_tables2 import SingleTableView
-from scripts.factrories.tables_factory import table_factory
-from scripts.themes.extra_columns import Delete, Add
-from scripts.themes.themes import Atlantis
-from django.views import View
-from scripts.factrories.form_factories import form_factory
+# django
 from django import forms
 from django.shortcuts import render
 from django.views.generic import base
-from pip._internal import req
-
-from .models import HILs
-from .forms import HILsModalForm
+from django.views import View
+from django.utils.html import format_html
 from django.urls import reverse_lazy
-from django.shortcuts import redirect
+from django.views.generic import TemplateView
+# django plugins
+from bootstrap_modal_forms.forms import BSModalModelForm
 from bootstrap_modal_forms.generic import BSModalCreateView, BSModalDeleteView, BSModalUpdateView
+from django_tables2 import SingleTableView
+from chartjs.views.lines import BaseLineChartView
+# factorio
+from scripts.factrories.form_factories import form_factory
+from scripts.factrories.tables_factory import table_factory
+from scripts.themes.themes import Atlantis
+# local imports
+from .tables import Action
+from .models import HILs
 
 
-class Action:
-    accessor = tables.Column(accessor=A('pk'), verbose_name='Action')
-    '<button class="btn btn-default"><a href="delete/{id}/">Delete</a></button>'
-    @staticmethod
-    def render_accessor(record):
-        return format_html('<button type="button" class="delete-book bs-modal btn btn-sm btn-danger" '
-                           'data-form-url="delete/{id}">'
-                           '<span class="fa fa-trash"></span>'
-                           '</button>'
-                           '<button type="button" class="update-book bs-modal btn btn-sm btn-primary"'
-                           ' data-form-url="update/{id}">'
-                           '<i class="fa fa-info"></i>'
-                           '</button>', id=record.id)
+class LineChartJSONView(BaseLineChartView):
 
-    def __str__(self):
-        return __class__.__name__
+    def get_labels(self):
+        """Return 7 labels for the x-axis."""
+        return ["January", "February", "March", "April", "May", "June", "July"]
+
+    def get_providers(self):
+        """Return names of datasets."""
+        return ["Central", "Eastside", "Westside"]
+
+    def get_data(self):
+        """Return 3 datasets to plot."""
+        return [[75, 44, 92, 11, 44, 95, 35],
+                [41, 92, 18, 3, 73, 87, 92],
+                [87, 21, 94, 3, 90, 13, 65]]
+
+    def get_datasets(self):
+        datasets = super().get_datasets()
+        for dataset in datasets:
+            if dataset["name"] == "Central":
+                dataset.update(self.get_dataset_options(0, (11, 252, 3)))
+            elif dataset["name"] == "Eastside":
+                dataset.update(self.get_dataset_options(0, (34, 51, 240)))
+            elif dataset["name"] == "Westside":
+                dataset.update(self.get_dataset_options(0, (232, 184, 28)))
+        return datasets
+
+
+class LineChartView(TemplateView):
+    template_name = 'table_view/chart.html'
+
+
+HILsModalForm = form_factory(model=HILs, theme=Atlantis,
+                             widgets={'responsible': forms.Textarea},
+                             form=BSModalModelForm)
 
 
 class HILsListView(SingleTableView):
@@ -47,14 +68,17 @@ class HILsListView(SingleTableView):
                                 extra_columns=[Action])
     template_name = 'table_view/table.html'
 
+    chart = None
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(self.extra_content)
+        context["chart"] = self.chart
         return context
 
     def get(self, request, *args, **kwargs):
+        self.chart = LineChartView.as_view()(request, *args, **kwargs).rendered_content
         g = super().get(request, *args, **kwargs)
-        a = BookCreateView.as_view()(request, *args, **kwargs)
         return g
 
 
